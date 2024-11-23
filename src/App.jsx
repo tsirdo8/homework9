@@ -8,80 +8,22 @@ function App() {
   const [currentModalImage, setCurrentModalImage] = useState(1); // Modal image
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility
   const [cartDetails, setCartDetails] = useState({ price: 0, quantity: 0 }); // Cart details
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // Burger menu state
 
   // Log cart details for debugging
   useEffect(() => {
     console.log("Cart updated:", cartDetails);
   }, [cartDetails]);
 
-  const handleImageChange = (imageNumber) => {
-    setCurrentImage(imageNumber);
-    setCurrentModalImage(imageNumber); // Synchronize modal image with the main image
-  };
-
-  const handleModalImageChange = (imageNumber) => {
-    setCurrentModalImage(imageNumber);
-  };
-
-  const handlePrevImage = () => {
-    setCurrentImage(currentImage === 1 ? 4 : currentImage - 1);
-  };
-
-  const handleNextImage = () => {
-    setCurrentImage(currentImage === 4 ? 1 : currentImage + 1);
-  };
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
   return (
     <>
       <HeaderComponent cart={cartDetails} setCart={setCartDetails} />
       <main className="w-full min-h-screen font-serif mb-5">
         <div className="md:py-16 pt-0 flex max-w-6xl flex-col md:flex-row justify-center md:mx-auto">
-          {/* Burger Menu for Mobile */}
-          <div className="md:hidden flex justify-between w-full px-5">
-            <button
-              className="text-vdBlue text-3xl"
-              onClick={toggleMenu} // Toggle burger menu
-            >
-              {isMenuOpen ? "X" : "☰"}
-            </button>
-            {isMenuOpen && (
-              <nav className="absolute left-0 right-0 top-16 bg-white shadow-lg p-5 z-50">
-                <ul className="space-y-4 text-lg">
-                  <li>
-                    <a href="#home" className="text-vdBlue">
-                      Home
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#shop" className="text-vdBlue">
-                      Shop
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#about" className="text-vdBlue">
-                      About
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#contact" className="text-vdBlue">
-                      Contact
-                    </a>
-                  </li>
-                </ul>
-              </nav>
-            )}
-          </div>
-
           {/* Desktop Image Section */}
           <div className="hidden w-1/2 md:flex flex-col items-center gap-6">
             <img
               src={`/images/photo${currentImage}.jpg`}
-              alt={`photo${currentImage}`}
+              alt={`photo${currentImage}.jpg`}
               className="w-96 rounded-xl cursor-pointer"
               onClick={() => setIsModalOpen(true)}
             />
@@ -90,55 +32,50 @@ function App() {
                 <img
                   key={imgNumber}
                   src={`/images/ph${imgNumber}.jpg`}
-                  alt={`photo${imgNumber}`}
+                  alt={`photo${imgNumber}.jpg`}
                   className={`w-[85px] rounded-xl hover:opacity-45 cursor-pointer ${
                     currentImage === imgNumber
                       ? "opacity-60 border-4 border-orange-500"
                       : ""
                   }`}
-                  onClick={() => handleImageChange(imgNumber)}
+                  onClick={() => setCurrentImage(imgNumber)}
                 />
               ))}
             </div>
           </div>
 
-          {/* Modal */}
-          {isModalOpen && (
+          {/* Mobile Image Carousel */}
+          <div className="md:hidden w-2/3 min-w-[375px] mx-auto relative mb-6">
+            <img
+              src={`/images/photo${currentImage}.jpg`}
+              alt={`photo${currentImage}.jpg`}
+              className="w-full"
+            />
             <div
-              className={`w-full h-screen left-0 fixed bg-opacity-90 bg-black flex flex-col gap-5 items-center justify-center z-50 top-0 transition-opacity ${
-                isModalOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-              }`}
+              className="w-12 h-12 bg-white absolute left-0 ms-3 rounded-full flex items-center justify-center cursor-pointer top-1/2 -translate-y-1/2"
+              onClick={() =>
+                currentImage === 1
+                  ? setCurrentImage(4)
+                  : setCurrentImage((prev) => prev - 1)
+              }
             >
-              <div className="w-96 relative">
-                <img
-                  src="/images/close.svg"
-                  alt="close.svg"
-                  className="w-5 ms-auto cursor-pointer"
-                  onClick={() => setIsModalOpen(false)}
-                />
-                <img
-                  src={`/images/photo${currentModalImage}.jpg`}
-                  alt={`photo${currentModalImage}`}
-                  className="w-96 rounded-xl cursor-pointer"
-                />
-                <div className="flex w-96 justify-between mt-3">
-                  {[1, 2, 3, 4].map((imgNumber) => (
-                    <img
-                      key={imgNumber}
-                      src={`/images/photo${imgNumber}-thumbnail.jpg`}
-                      alt={`photo${imgNumber}`}
-                      className={`w-[85px] rounded-xl hover:opacity-45 cursor-pointer ${
-                        currentModalImage === imgNumber
-                          ? "opacity-60 border-4 border-orange-500"
-                          : ""
-                      }`}
-                      onClick={() => handleModalImageChange(imgNumber)}
-                    />
-                  ))}
-                </div>
-              </div>
+              <img
+                src="/images/previous.svg"
+                alt="previous.svg"
+                className="w-3"
+              />
             </div>
-          )}
+            <div
+              className="w-12 h-12 bg-white absolute right-0 top-1/2 -translate-y-1/2 me-3 rounded-full flex items-center justify-center cursor-pointer"
+              onClick={() =>
+                currentImage === 4
+                  ? setCurrentImage(1)
+                  : setCurrentImage((prev) => prev + 1)
+              }
+            >
+              <img src="/images/next.svg" alt="next.svg" className="w-3" />
+            </div>
+          </div>
 
           {/* Product and Cart Section */}
           <div className="flex flex-col px-3 lg:px-0 md:w-1/2 justify-center w-2/3 min-w-[375px] mx-auto">
@@ -171,7 +108,6 @@ function App() {
                   onClick={() =>
                     orderCount > 0 && setOrderCount((prev) => prev - 1)
                   }
-                  disabled={orderCount === 0} // Disabled when quantity is 0
                 >
                   <img
                     src="/images/minus.svg"
@@ -186,24 +122,21 @@ function App() {
                   <img src="/images/plus.svg" alt="plus.svg" className="w-3" />
                 </button>
               </div>
-
-              {/* Add to Cart Button */}
+              {/* Add to Cart */}
               <button
                 className="bg-orange-500 md:w-52 w-full mx-auto md:mx-0 py-3 flex items-center gap-3 bg-Orange hover:bg-PaleOrange justify-center rounded-lg text-vdBlue font-bold"
                 onClick={() => {
                   if (orderCount > 0) {
-                    // Add the selected quantity and price to the cart
                     setCartDetails((prevCart) => ({
                       ...prevCart,
-                      price: 125 * orderCount, // Dynamically calculate total price
+                      price: 125 * orderCount, // Calculate total price dynamically
                       quantity: prevCart.quantity + orderCount, // Add to existing quantity
                     }));
                     setOrderCount(0); // Reset the order count after adding to cart
-                    alert(`Added ${orderCount} item(s) to your cart!`); // Confirmation alert
                   } else {
                     alert(
                       "Please select at least one item to add to the cart."
-                    ); // Alert if no items are selected
+                    );
                   }
                 }}
               >
@@ -217,6 +150,40 @@ function App() {
             </div>
           </div>
         </div>
+
+        {/* Modal */}
+        {isModalOpen && (
+          <div className="w-full h-screen left-0 fixed bg-opacity-90 bg-black flex flex-col gap-5 items-center justify-center z-50 top-0 ">
+            <div className="w-96 relative">
+              <img
+                src="/images/close.svg"
+                alt="close.svg"
+                className="w-5 ms-auto cursor-pointer"
+                onClick={() => setIsModalOpen(false)}
+              />
+              <img
+                src={`/images/photo${currentModalImage}.jpg`}
+                alt={`photo${currentModalImage}`}
+                className="w-96 rounded-xl cursor-pointer"
+              />
+              <div className="flex w-96 justify-between mt-3">
+                {[1, 2, 3, 4].map((imgNumber) => (
+                  <img
+                    key={imgNumber}
+                    src={`/images/ph${imgNumber}.jpg`}
+                    alt={`photo${imgNumber}`}
+                    className={`w-[85px] rounded-xl hover:opacity-45 cursor-pointer ${
+                      currentModalImage === imgNumber
+                        ? "opacity-60 border-4 border-orange-500"
+                        : ""
+                    }`}
+                    onClick={() => setCurrentModalImage(imgNumber)}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </main>
       <FooterComponent />
     </>
